@@ -64,6 +64,7 @@ Persona perso =  persoServ.buscarPersona(id);
         perso.setCelular(aboutDto.getCelular());
         perso.setEmail(aboutDto.getEmail());
         perso.setDescripcion(aboutDto.getDescripcion());
+
     
         persoServ.crearPersona(perso);
         //retorna la nueva persona
