@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtProvider {
@@ -22,11 +24,28 @@ public class JwtProvider {
 
     public String generateToken(Authentication authentication){
         UsuarioPrincipal usuarioPrincipal = (UsuarioPrincipal) authentication.getPrincipal();
-        return Jwts.builder().setSubject(usuarioPrincipal.getUsername())
+
+        Claims claims = Jwts.claims().setSubject(usuarioPrincipal.getUsername());
+
+
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map((s) -> {return s.getAuthority();}).collect(Collectors.toList());
+
+        claims.put("roles", authorities);
+        return Jwts.builder()
+                .setClaims(claims)
+                //.setPayload(secret)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expiration * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
+
+        /*return Jwts.builder().setSubject(usuarioPrincipal.getUsername())
+                .setPayload(secret)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + expiration * 1000))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();*/
     }
 
     public String getNombreUsuarioFromToken(String token){
